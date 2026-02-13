@@ -146,11 +146,11 @@ if (discord == "Yes" && discordWebhook != "N/A"){
 
         ; Add in sending message here
 
-        msgBox, 4, "Discord Integration","Does the code below line up with the discord code:" . `n numberCheck 
+        MsgBox, 4, "Discord Integration","Does the code below line up with the discord code:" . `n numberCheck 
     }
 }
 
-; Gui Creationx
+; Gui Creation
 SysGet, monitorCount, MonitorCount
 SysGet, mainMonitor, MonitorPrimary
 SysGet, primMon, Monitor, mainMonitor
@@ -164,6 +164,13 @@ guiWidth := (primMonBottom - primMonTop)/2.5
 guiHeight := (primMonRight - primMonLeft)/8
 
 Gui, SSA:New, AlwaysOnTop -Caption, SSA
+
+; Adds in theme colors
+if (theme == "Dark"){
+    Gui, Color, 1e1e1e
+} else if (theme == "Light"){
+    Gui, Color, FFFFFF
+}
 titleLoadWidth := guiWidth/1.5
 titleLoadHeight := guiHeight/1.5
 Gui, Show,w%guiWidth% h%guiHeight%
