@@ -142,10 +142,10 @@ if (optimized == "No"){
 ; Discord Integration
 if (discord == "Yes" && discordWebhook != "N/A"){
     if (optimized == "No"){
-        random, numberCheck 10000,99999
+        random, numberCheck 1000000,9999999
 
+        ; Add in sending message here
 
-        
         msgBox, 4, "Discord Integration","Does the code below line up with the discord code:" . `n numberCheck 
     }
 }
