@@ -140,15 +140,30 @@ if (optimized == "No"){
 }
 
 ; Discord Integration
+check := False
 if (discord == "Yes" && discordWebhook != "N/A"){
 
     ; Check for wifi connection here
     if (optimized == "No"){
-        random, numberCheck 1000000,9999999
+        While, check != True
+            random, numberCheck 1000000,9999999
 
-        ; Add in sending message here
+    
+            ; Add in sending message here
+            MsgBox, 4, "Discord Integration","Does the code below line up with the discord code:" . `n numberCheck 
 
-        MsgBox, 4, "Discord Integration","Does the code below line up with the discord code:" . `n numberCheck 
+            IfMsgBox, Yes
+                check := True
+            else
+                InputBox, newWebhook, "Discord Integration", "Please enter a new webhook url here:", Hide
+                if ErrorLevel
+                    check := True
+                else
+                    discordWebhook := newWebhook
+                    if discordWebhook not contains "https://discord.com/api/webhooks/"
+                        discordWebhook := "N/A"
+                    goto, RewriteSettings
+
     } else {
 
         ; Send a message in discord saying connected
