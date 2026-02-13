@@ -39,6 +39,8 @@ autoStart := BaseSettings[8]
 DiscordSettings := StrSplit(discordSettings, ":")
 discord := DiscordSettings[2]
 discordWebhook := DiscordSettings[4]
+if discordWebhook not contains "https://discord.com/api/webhooks/"
+    discordWebhook := "N/A"
 sendSS := DiscordSettings[6]
 sendHPH := DiscordSettings[8]
 sendHourly := DiscordSettings[10]
@@ -50,7 +52,7 @@ FileDelete, "Settings.txt"
 FileAppend,  These are settings, please do not manually change anything if you do not know what you are doing, thank you.`nTheme:%theme%:Optimized:%optimized%:AutoInstall:%autoInstall%:AutoStart:%autoStart%`nDiscord:%discord%:DiscordWebhook:%discordWebhook%:SendScreenShots:%sendSS%:SendHPH:%sendHPH%:SendHourly:%sendHourly%, data\Settings.txt
 return
 
-; Checking Dependencies if not optimized
+; Checking dependencies if not optimized
 if (optimized == "No"){
     depen := CheckDepen()
     if (depen == 3){
@@ -58,67 +60,97 @@ if (optimized == "No"){
     } else if (depen == 2){
         ; Missing Ahk 32
         Msgbox, "You are missing AHK 32 in your dependencies folder"
-        MsgBox, "Attempting to download AHK 32 into your dependecies folder"
-        FileUrl := "https://github.com/colerog/SSA//dependencies/AutoHotkey32.exe"
-        SavePath := "%A_ScriptDir%\..\dependencies\AutoHotkey32.exe"
-        UrlDownloadToFile, %FileUrl%, %SavePath%
-        if (FileExist("%A_ScriptDir%\..\dependencies\AutoHotkey32.exe")){
-            MsgBox, "Succesfully installed AHK 32 into your dependencies folder"
-            MsgBox, "Restarting SSA now"
-            Reload
-        } else{
-            MsgBox, "Failed to install AHK 32 into your dependencies folder"
+        if (autoInstall == "Yes"){
+            MsgBox, "Attempting to download AHK 32 into your dependecies folder"
+            FileUrl := "https://github.com/colerog/SSA//dependencies/AutoHotkey32.exe"
+            SavePath := "%A_ScriptDir%\..\dependencies\AutoHotkey32.exe"
+            UrlDownloadToFile, %FileUrl%, %SavePath%
+            if (FileExist("%A_ScriptDir%\..\dependencies\AutoHotkey32.exe")){
+                MsgBox, "Succesfully installed AHK 32 into your dependencies folder"
+                MsgBox, "Restarting SSA now"
+                Reload
+            } else{
+                MsgBox, "Failed to install AHK 32 into your dependencies folder"
+                MsgBox, "Please manually download AHK 32 and restart SSA to continue"
+                ExitApp
+            }
+        } else {
             MsgBox, "Please manually download AHK 32 and restart SSA to continue"
             ExitApp
         }
-        ExitApp()
     } else if (depen == 1){
         ; Missing Ahk 64
         Msgbox, "You are missing AHK 64 in your dependencies folder"
-        MsgBox, "Attempting to download AHK 64 into your dependecies folder"
-        FileUrl := "https://github.com/colerog/SSA//dependencies/AutoHotkey64.exe"
-        SavePath := "%A_ScriptDir%\..\dependencies\AutoHotkey64.exe"
-        UrlDownloadToFile, %FileUrl%, %SavePath%
-        if (FileExist("%A_ScriptDir%\..\dependencies\AutoHotkey64.exe")){
-            MsgBox, "Succesfully installed AHK 64 into your dependencies folder"
-            MsgBox, "Restarting SSA now"
-            Reload
-        } else{
-            MsgBox, "Failed to install AHK 64 into your dependencies folder"
+        if (autoInstall == "Yes"){
+            MsgBox, "Attempting to download AHK 64 into your dependecies folder"
+            FileUrl := "https://github.com/colerog/SSA//dependencies/AutoHotkey64.exe"
+            SavePath := "%A_ScriptDir%\..\dependencies\AutoHotkey64.exe"
+            UrlDownloadToFile, %FileUrl%, %SavePath%
+            if (FileExist("%A_ScriptDir%\..\dependencies\AutoHotkey64.exe")){
+                MsgBox, "Succesfully installed AHK 64 into your dependencies folder"
+                MsgBox, "Restarting SSA now"
+                Reload
+            } else{
+                MsgBox, "Failed to install AHK 64 into your dependencies folder"
+                MsgBox, "Please manually download AHK 64 and restart SSA to continue"
+                ExitApp
+            }
+        } else {
             MsgBox, "Please manually download AHK 64 and restart SSA to continue"
             ExitApp
         }
     } else {
         ; Missing both
         Msgbox, "You are missing both versions of AHK in your dependencies folder"
-        MsgBox, "Attempting to download AHK 64 into your dependecies folder"
-        FileUrl := "https://github.com/colerog/SSA//dependencies/AutoHotkey64.exe"
-        SavePath := "%A_ScriptDir%\..\dependencies\AutoHotkey64.exe"
-        MsgBox, "Attempting to download AHK 32 into your dependecies folder"
-        FileUrl := "https://github.com/colerog/SSA//dependencies/AutoHotkey64.exe"
-        SavePath := "%A_ScriptDir%\..\dependencies\AutoHotkey64.exe"
-        UrlDownloadToFile, %FileUrl%, %SavePath%
-        if (FileExist("%A_ScriptDir%\..\dependencies\AutoHotkey64.exe")){
-            MsgBox, "Succesfully installed AHK 64 into your dependencies folder"
-            if (FileExist("%A_ScriptDir%\..\dependencies\AutoHotkey32.exe")){
-                MsgBox, "Succesfully installed AHK 32 into your dependencies folder"
-                MsgBox, "Restarting SSA now"
-                Reload
-            } else {
-                MsgBox, "Failed to install AHK 32 into your dependencies folder"
-                MsgBox, "Please manually download AHK 32 and restart SSA to continue"
-                ExitApp
+        if (autoInstall == "Yes"){
+            MsgBox, "Attempting to download AHK 64 into your dependecies folder"
+            FileUrl := "https://github.com/colerog/SSA//dependencies/AutoHotkey64.exe"
+            SavePath := "%A_ScriptDir%\..\dependencies\AutoHotkey64.exe"
+            UrlDownloadToFile, %FileUrl%, %SavePath%
+            MsgBox, "Attempting to download AHK 32 into your dependecies folder"
+            FileUrl := "https://github.com/colerog/SSA//dependencies/AutoHotkey64.exe"
+            SavePath := "%A_ScriptDir%\..\dependencies\AutoHotkey64.exe"
+            UrlDownloadToFile, %FileUrl%, %SavePath%
+            if (FileExist("%A_ScriptDir%\..\dependencies\AutoHotkey64.exe")){
+                MsgBox, "Succesfully installed AHK 64 into your dependencies folder"
+                if (FileExist("%A_ScriptDir%\..\dependencies\AutoHotkey32.exe")){
+                    MsgBox, "Succesfully installed AHK 32 into your dependencies folder"
+                    MsgBox, "Restarting SSA now"
+                    Reload
+                } else {
+                    MsgBox, "Failed to install AHK 32 into your dependencies folder"
+                    MsgBox, "Please manually download AHK 32 and restart SSA to continue"
+                    ExitApp
+                }
+            } else{
+                if (FileExist("%A_ScriptDir%\..\dependencies\AutoHotkey32.exe")){
+                    MsgBox, "Failed to install AHK 64 into your dependencies folder"
+                    MsgBox, "Succesfully installed AHK 32 into your dependencies folder"
+                    MsgBox, "Please manually download AHK 64 and restart SSA to continue"
+                    ExitApp
+                } else {
+                    MsgBox, "Failed to install both AHK 64 and AHK 32 into your dependencies folder"
+                    MsgBox, "Please manually download both AHK 64 and AHK 32 and restart SSA to continue"
+                }
             }
-        } else{
-            MsgBox, "Failed to install AHK 64 into your dependencies folder"
-            MsgBox, "Please manually download AHK 64 and restart SSA to continue"
-            ExitApp
+        } else {
+            MsgBox, "Please manually download both AHK 32 and AHK 64 and restart SSA to continue"
         }
-        ExitApp
     }
 }
 
-; Gui Creation
+; Discord Integration
+if (discord == "Yes" && discordWebhook != "N/A"){
+    if (optimized == "No"){
+        random, numberCheck 10000,99999
+
+
+        
+        msgBox, 4, "Discord Integration","Does the code below line up with the discord code:" . `n numberCheck 
+    }
+}
+
+; Gui Creationx
 SysGet, monitorCount, MonitorCount
 SysGet, mainMonitor, MonitorPrimary
 SysGet, primMon, Monitor, mainMonitor
