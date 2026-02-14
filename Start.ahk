@@ -1,5 +1,5 @@
 /*
-SSA v0.2.4
+SSA v0.3.0
 
 Created by colerog & InformationDenier
 Repository: https://github.com/colerog/SSA_Macro
@@ -9,52 +9,79 @@ Repository: https://github.com/colerog/SSA_Macro
 #SingleInstance Force
 
 ; Libraries and data
-#Include "A_ScriptDir\..\libraries"
-#Include "DependencyChecker.ahk"
-#Include "A_ScriptDir%\..\data"
+#Include %A_ScriptDir%\libraries
+#Include %A_ScriptDir%\data
 
 ; Makes sure a settings file exists, if it doesnt it creates one
-if (FileExist("Settings.txt")){
-    #Include "Settings.txt"
+if (FileExist(A_ScriptDir . "\data\Settings.txt")){
+    MsgBox, "FILE EXISTS"
 } else {
-    FileAppend, "These are settings, please do not manually change anything if you do not know what you are doing, thank you."`n"Theme:Dark:Optimized:No:AutoInstall:No:AutoStart:No`nDiscord:No:DiscordWebhook:N/A:SendScreenShots:No:SendHPH:No:SendHourly:No", Settings.txt
-    #Include "Settings.txt"
+    MsgBox, "FILE DOES NOT EXIST"
+    FileAppend, Please do not manually change anything if you do not know what you are doing. `n Theme:-+-:Dark:-+-:Optimized:-+-:No:-+-:AutoInstall:-+-:No:-+-:AutoStart:-+-:No`nDiscord:-+-:No:-+-:DiscordWebhook:-+-:N/A:-+-:SendScreenShots:-+-:No:-+-:SendHPH:-+-:No:-+-:SendHourly:-+-:No, %A_WorkingDir%\data\Settings.txt
 }
 
 ; Implements the settings into the code
 goto, GetSettings
+MsgBox, "Made it here"
 goto, RewriteSettings
 
-
 GetSettings:
-FileReadLine, baseSettings, Settings.txt, 2
-FileReadLine, discordSettings, Settings.txt, 3
+    MsgBox, "Made it here1"
+    FileReadLine, baseSettings, %A_ScriptDir%\data\Settings.txt, 2
+    MsgBox, "Made it here2"
+    FileReadLine, discordSettings, %A_ScriptDir%\data\Settings.txt, 3
+    MsgBox, "Made it here3"
+    BaseSettings := StrSplit(baseSettings, ":-+-:")
+    theme := BaseSettings[2]
+    optimized := BaseSettings[4]
+    autoInstall := BaseSettings[6]
+    autoStart := BaseSettings[8]
 
-BaseSettings := StrSplit(baseSettings, ":")
-theme := BaseSettings[2]
-optimized := BaseSettings[4]
-autoInstall := BaseSettings[6]
-autoStart := BaseSettings[8]
-
-DiscordSettings := StrSplit(discordSettings, ":")
-discord := DiscordSettings[2]
-discordWebhook := DiscordSettings[4]
-if discordWebhook not contains "https://discord.com/api/webhooks/"
-    discordWebhook := "N/A"
-sendSS := DiscordSettings[6]
-sendHPH := DiscordSettings[8]
-sendHourly := DiscordSettings[10]
+    DiscordSettings := StrSplit(discordSettings, ":-+-:")
+    discord := DiscordSettings[2]
+    discordWebhook := DiscordSettings[4]
+    if (discordWebhook not contains "https://discord.com/api/webhooks/"){
+        MsgBox, Does not contain
+        discordWebhook := "N/A"
+    }
+    sendSS := DiscordSettings[6]
+    sendHPH := DiscordSettings[8]
+    sendHourly := DiscordSettings[10]
+    MsgBox, "Made it here5"
+    goto, RewriteSettings
 return
 
 ; Write current settings into the settings file to update it
 RewriteSettings:
-FileDelete, "Settings.txt"
-FileAppend,  These are settings, please do not manually change anything if you do not know what you are doing, thank you.`nTheme:%theme%:Optimized:%optimized%:AutoInstall:%autoInstall%:AutoStart:%autoStart%`nDiscord:%discord%:DiscordWebhook:%discordWebhook%:SendScreenShots:%sendSS%:SendHPH:%sendHPH%:SendHourly:%sendHourly%, data\Settings.txt
+MsgBox, "Made it here Delete"
+FileDelete, %A_ScriptDir%\data\Settings.txt
+MsgBox, %discordWebhook%
+if (!InStr(discordWebhook, "https://discord.com/api/webhooks/")) {
+    MsgBox, Changing it
+    discordWebhook := "N/A"
+}
+FileAppend, Please do not manually change anything if you do not know what you are doing.`nTheme:-+-:%theme%:-+-:Optimized:-+-:%optimized%:-+-:AutoInstall:-+-:%autoInstall%:-+-:AutoStart:-+-:%autoStart%`nDiscord:-+-:%discord%:-+-:DiscordWebhook:-+-:%discordWebhook%:-+-:SendScreenShots:-+-:%sendSS%:-+-:SendHPH:-+-:%sendHPH%:-+-:SendHourly:-+-:%sendHourly%, %A_ScriptDir%\data\Settings.txt
+MsgBox, "Made it here post append"
+goto Setup
 return
 
 ; Checking dependencies if not optimized
+Setup:
+depen = -1
+if FileExist("A_ScriptDir%\..\dependencies\AutoHotkey32.exe"){
+    if FileExist("A_ScriptDir%\..\dependencies\AutoHotkey64.exe") {
+    depen = 3
+    } else {
+    depen = 1
+    }
+} else if FileExist("A_ScriptDir%\..\dependencies\AutoHotkey64.exe") {
+    depen = 2
+} else {
+    depen = 0
+}
+MsgBox, %depen%
+
 if (optimized == "No"){
-    depen := CheckDepen()
     if (depen == 3){
         ; All dependencies acounted for
     } else if (depen == 2){
@@ -108,8 +135,8 @@ if (optimized == "No"){
             SavePath := "A_ScriptDir\..\dependencies\AutoHotkey64.exe"
             UrlDownloadToFile, %FileUrl%, %SavePath%
             MsgBox, "Attempting to download AHK 32 into your dependecies folder"
-            FileUrl := "https://github.com/colerog/SSA//dependencies/AutoHotkey64.exe"
-            SavePath := "A_ScriptDir\..\dependencies\AutoHotkey64.exe"
+            FileUrl := "https://github.com/colerog/SSA//dependencies/AutoHotkey32.exe"
+            SavePath := "A_ScriptDir\..\dependencies\AutoHotkey32.exe"
             UrlDownloadToFile, %FileUrl%, %SavePath%
             if (FileExist("A_ScriptDir\..\dependencies\AutoHotkey64.exe")){
                 MsgBox, "Succesfully installed AHK 64 into your dependencies folder"
@@ -139,31 +166,52 @@ if (optimized == "No"){
     }
 }
 
+MsgBox, "Made it here pre discord"
+MsgBox, %discord%
+MsgBox, %discordWebhook%
 ; Discord Integration
-check := False
-if (discord == "Yes" && discordWebhook != "N/A"){
-
+checkDiscord := False
+if (discord = "Yes") and (discordWebhook != "N/A") and (InStr(discordWebhook, "https://discord.com/api/webhooks/")){
+    MsgBox, "DISCORD"
     ; Check for wifi connection here
     if (optimized == "No"){
-        While, check != True
-            random, numberCheck 1000000,9999999
+        While (checkDiscord != True){
+            random, numberCheck, 1000000,9999999
 
 
             ; Add in sending message here
-            MsgBox, 4, "Discord Integration","Does the code below line up with the discord code:" . `n numberCheck 
+            postdata=
+                (
+                {
+                    "embeds": [
+                    {
+                    "title": "SSA",
+                    "description": "Your code: \n %numberCheck% ",
+                    "color": 550619
+                    }
+                ]
+            }
+            )
+
+            WebRequest := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+            WebRequest.Open("POST", discordWebhook, false)
+            WebRequest.SetRequestHeader("Content-Type", "application/json")
+            WebRequest.Send(postdata) 
+            
+            MsgBox, 4, "Discord Integration","Does the code below line up with the discord code:" . `n %numberCheck% 
 
             IfMsgBox, Yes
-                check := True
-            else
-                InputBox, newWebhook, "Discord Integration", "Please enter a new webhook url here:", Hide
+                checkDiscord := True
+            else{
+                InputBox, newWebhook, "Discord Integration", "Please enter a new webhook url here:",
                 if ErrorLevel
-                    check := True
-                else
+                    checkDiscord := True
+                else {
                     discordWebhook := newWebhook
-                    if discordWebhook not contains "https://discord.com/api/webhooks/"
-                        discordWebhook := "N/A"
                     goto, RewriteSettings
-
+                }
+            }
+        }
     } else {
 
         ; Send a message in discord saying connected
@@ -186,7 +234,7 @@ guiHeight := (primMonRight - primMonLeft)/8
 Gui, SSA:New, AlwaysOnTop -Caption, SSA
 
 ; Adds in theme colors
-FileReadLine, themeMainColor, "A_ScriptDir\..\assets\themes\" . %theme% . ".txt", 4
+FileReadLine, themeMainColor, %A_ScriptDir%\assets\themes\ . %theme% . .txt, 4
 Gui, Color, %themeMainColor%
 titleLoadWidth := guiWidth/1.5
 titleLoadHeight := guiHeight/1.5
