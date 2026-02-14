@@ -14,23 +14,17 @@ Repository: https://github.com/colerog/SSA_Macro
 
 ; Makes sure a settings file exists, if it doesnt it creates one
 if (FileExist(A_ScriptDir . "\data\Settings.txt")){
-    MsgBox, "FILE EXISTS"
 } else {
-    MsgBox, "FILE DOES NOT EXIST"
     FileAppend, Please do not manually change anything if you do not know what you are doing. `n Theme:-+-:Dark:-+-:Optimized:-+-:No:-+-:AutoInstall:-+-:No:-+-:AutoStart:-+-:No`nDiscord:-+-:No:-+-:DiscordWebhook:-+-:N/A:-+-:SendScreenShots:-+-:No:-+-:SendHPH:-+-:No:-+-:SendHourly:-+-:No, %A_WorkingDir%\data\Settings.txt
 }
 
 ; Implements the settings into the code
 goto, GetSettings
-MsgBox, "Made it here"
 goto, RewriteSettings
 
 GetSettings:
-    MsgBox, "Made it here1"
     FileReadLine, baseSettings, %A_ScriptDir%\data\Settings.txt, 2
-    MsgBox, "Made it here2"
     FileReadLine, discordSettings, %A_ScriptDir%\data\Settings.txt, 3
-    MsgBox, "Made it here3"
     BaseSettings := StrSplit(baseSettings, ":-+-:")
     theme := BaseSettings[2]
     optimized := BaseSettings[4]
@@ -47,21 +41,16 @@ GetSettings:
     sendSS := DiscordSettings[6]
     sendHPH := DiscordSettings[8]
     sendHourly := DiscordSettings[10]
-    MsgBox, "Made it here5"
     goto, RewriteSettings
 return
 
 ; Write current settings into the settings file to update it
 RewriteSettings:
-MsgBox, "Made it here Delete"
 FileDelete, %A_ScriptDir%\data\Settings.txt
-MsgBox, %discordWebhook%
 if (!InStr(discordWebhook, "https://discord.com/api/webhooks/")) {
-    MsgBox, Changing it
     discordWebhook := "N/A"
 }
 FileAppend, Please do not manually change anything if you do not know what you are doing.`nTheme:-+-:%theme%:-+-:Optimized:-+-:%optimized%:-+-:AutoInstall:-+-:%autoInstall%:-+-:AutoStart:-+-:%autoStart%`nDiscord:-+-:%discord%:-+-:DiscordWebhook:-+-:%discordWebhook%:-+-:SendScreenShots:-+-:%sendSS%:-+-:SendHPH:-+-:%sendHPH%:-+-:SendHourly:-+-:%sendHourly%, %A_ScriptDir%\data\Settings.txt
-MsgBox, "Made it here post append"
 goto Setup
 return
 
@@ -79,7 +68,6 @@ if FileExist("A_ScriptDir%\..\dependencies\AutoHotkey32.exe"){
 } else {
     depen = 0
 }
-MsgBox, %depen%
 
 if (optimized == "No"){
     if (depen == 3){
@@ -166,13 +154,9 @@ if (optimized == "No"){
     }
 }
 
-MsgBox, "Made it here pre discord"
-MsgBox, %discord%
-MsgBox, %discordWebhook%
 ; Discord Integration
 checkDiscord := False
 if (discord = "Yes") and (discordWebhook != "N/A") and (InStr(discordWebhook, "https://discord.com/api/webhooks/")){
-    MsgBox, "DISCORD"
     ; Check for wifi connection here
     if (optimized == "No"){
         While (checkDiscord != True){
@@ -234,13 +218,49 @@ guiHeight := (primMonRight - primMonLeft)/8
 Gui, SSA:New, AlwaysOnTop -Caption, SSA
 
 ; Adds in theme colors
-FileReadLine, themeMainColor, %A_ScriptDir%\assets\themes\ . %theme% . .txt, 4
-Gui, Color, %themeMainColor%
+themeFile := A_ScriptDir "\assets\themes\" theme ".txt"
+FileReadLine, themeMainColor, % themeFile, 4
+themeMainColor := Trim(themeMainColor)
 titleLoadWidth := guiWidth/1.5
 titleLoadHeight := guiHeight/1.5
+
+; Top bar for gui
+xButtonSize := guiWidth*0.05
+xButtonX := guiWidth*0.0175
+xButtonY := guiHeight*0.025
+Gui, Add, Button, Default W%xButtonSize% H%xButtonSize% X%xButtonX% Y%xButtonY% VxButton, x
+
+oButtonSize := guiWidth*0.05
+oButtonX := guiWidth*0.0675
+oButtonY := guiHeight*0.025
+Gui, Add, Button, Default W%oButtonSize% H%oButtonSize% X%oButtonX% Y%oButtonY% VoButton, +
+
+mButtonSize := guiWidth*0.05
+mButtonX := guiWidth*0.1175
+mButtonY := guiHeight*0.025
+Gui, Add, Button, Default W%mButtonSize% H%mButtonSize% X%mButtonX% Y%mButtonY% VmButton, -
+Gui, Color, %themeMainColor%
 Gui, Show,w%guiWidth% h%guiHeight%
 
+; Adds rounded corners
+WinGet, hwnd, ID, A
+radius := 25
+hRgn := DllCall("gdi32\CreateRoundRectRgn"
+    , "Int", 0
+    , "Int", 0
+    , "Int", guiWidth
+    , "Int", guiHeight
+    , "Int", radius
+    , "Int", radius
+    , "Ptr")
 
+DllCall("user32\SetWindowRgn", "Ptr", hwnd, "Ptr", hRgn, "Int", true)
+iconsize := 32  ; Ideal size for alt-tab varies between systems and OS versions.
+hIcon := LoadPicture("My Icon.ico", "Icon1 w" iconsize " h" iconsize, imgtype)
+Gui +LastFound
+SendMessage 0x0080, 1, hIcon  ; 0x0080 is WM_SETICON; and 1 means ICON_BIG (vs. 0 for ICON_SMALL).
 return
 
+GuiClose:
+ExitApp
 ^x::ExitApp
