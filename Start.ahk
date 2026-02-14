@@ -255,7 +255,7 @@ hRgn := DllCall("gdi32\CreateRoundRectRgn"
     , "Ptr")
 
 DllCall("user32\SetWindowRgn", "Ptr", hwnd, "Ptr", hRgn, "Int", true)
-iconsize := 32  ; Ideal size for alt-tab varies between systems and OS versions.
+iconsize := 32  
 hIcon := LoadPicture("My Icon.ico", "Icon1 w" iconsize " h" iconsize, imgtype)
 Gui +LastFound
 SendMessage 0x0080, 1, hIcon
